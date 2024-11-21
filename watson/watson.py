@@ -284,7 +284,7 @@ class Watson(object):
         self.current = new_frame
         return self.current
 
-    def stop(self, stop_at=None, note=None):
+    def stop(self, stop_at=None, note=None, note_handling="concat"):
         if not self.is_started:
             raise WatsonError("No project started.")
 
@@ -301,6 +301,15 @@ class Watson(object):
             raise WatsonError('Task cannot end before it starts.')
         if stop_at > arrow.now():
             raise WatsonError('Task cannot end in the future.')
+
+        # no note specified, use that from the current frame
+        if note is None:
+            note = old.get('note')
+        else:
+            if note_handling == "concat":
+                note = old.get('note', "") + note
+            else:
+                note = old.get('note')
 
         frame = self.frames.add(
             old['project'], old['start'], stop_at, tags=old['tags'], note=note
