@@ -1310,10 +1310,11 @@ def frames(watson):
               help="Confirm addition of new project.")
 @click.option('-b', '--confirm-new-tag', is_flag=True, default=False,
               help="Confirm creation of new tag.")
-# FIXME: accept -n 'note' here!
+@click.option('-n', '--note', type=str, default=None,
+              help="A brief note that describe time entry being added.")
 @click.pass_obj
 @catch_watson_error
-def add(watson, args, from_, to, confirm_new_project, confirm_new_tag):
+def add(watson, args, from_, to, confirm_new_project, confirm_new_tag, note):
     """
     Add time to a project with tag(s) that was not tracked live.
 
@@ -1344,7 +1345,7 @@ def add(watson, args, from_, to, confirm_new_project, confirm_new_tag):
         confirm_tags(tags, watson.tags)
 
     # add a new frame, call watson save to update state files
-    frame = watson.add(project=project, tags=tags, from_date=from_, to_date=to)
+    frame = watson.add(project=project, tags=tags, from_date=from_, to_date=to, note=note)
     click.echo(
         "Adding project {}{}, started {} and stopped {}. (id: {})".format(
             style('project', frame.project),
@@ -1354,6 +1355,9 @@ def add(watson, args, from_, to, confirm_new_project, confirm_new_tag):
             style('short_id', frame.id)
         )
     )
+    if note:
+        click.echo(format_note(note))
+
     watson.save()
 
 
