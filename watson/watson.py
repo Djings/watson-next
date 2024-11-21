@@ -144,6 +144,7 @@ class Watson(object):
                         'project': self.current['project'],
                         'start': self._format_date(self.current['start']),
                         'tags': self.current['tags'],
+                        'note': self.current.get('note'),
                     }
                 else:
                     current = {}
@@ -205,7 +206,8 @@ class Watson(object):
         self._current = {
             'project': value['project'],
             'start': start,
-            'tags': value.get('tags') or []
+            'tags': value.get('tags') or [],
+            'note': value.get('note'),
         }
 
         if self._old_state is None:
@@ -235,6 +237,7 @@ class Watson(object):
     def is_started(self):
         return bool(self.current)
 
+    # FIXME: add "note" parameter
     def add(self, project, from_date, to_date, tags):
         if not project:
             raise WatsonError("No project given.")
@@ -244,11 +247,12 @@ class Watson(object):
         default_tags = self.config.getlist('default_tags', project)
         tags = (tags or []) + default_tags
 
+        # FIXME: add "note" parameter
         frame = self.frames.add(project, from_date, to_date, tags=tags)
         return frame
 
     def start(self, project, tags=None, restart=False, start_at=None,
-              gap=True):
+              gap=True, note=None):
         if self.is_started:
             raise WatsonError(
                 "Project {} is already started.".format(
@@ -272,7 +276,7 @@ class Watson(object):
         if start_at > arrow.now():
             raise WatsonError('Task cannot start in the future.')
 
-        new_frame = {'project': project, 'tags': deduplicate(tags)}
+        new_frame = {'project': project, 'tags': deduplicate(tags), 'note': note}
         new_frame['start'] = start_at
         if not gap:
             stop_of_prev_frame = self.frames[-1].stop
@@ -280,7 +284,7 @@ class Watson(object):
         self.current = new_frame
         return self.current
 
-    def stop(self, stop_at=None):
+    def stop(self, stop_at=None, note=None):
         if not self.is_started:
             raise WatsonError("No project started.")
 
@@ -299,7 +303,7 @@ class Watson(object):
             raise WatsonError('Task cannot end in the future.')
 
         frame = self.frames.add(
-            old['project'], old['start'], stop_at, tags=old['tags']
+            old['project'], old['start'], stop_at, tags=old['tags'], note=note
         )
         self.current = None
 
@@ -548,6 +552,7 @@ class Watson(object):
 
         if self.current and current:
             cur = self.current
+            # FIXME: this seems to need note!
             self.frames.add(cur['project'], cur['start'], arrow.utcnow(),
                             cur['tags'], id="current")
 
@@ -585,10 +590,27 @@ class Watson(object):
             )
             total += delta
 
+            project_notes = []
+            for frame in frames:
+                # If the user is trying to print out all frames in the project
+                # (tags will be empty because no tags were passed)
+                if not tags and frame.note:
+                    # And this frame has no tags...
+                    if not frame.tags:
+                        # Add it to the project-level notes because it
+                        # won't get included in the tag-level notes
+                        # because it has no tag.
+                        project_notes.append(frame.note)
+                    # And this frame has a tag...
+                    else:
+                        # Let the tag-level filter handle this frame later on
+                        pass
+
             project_report = {
                 'name': project,
                 'time': delta.total_seconds(),
-                'tags': []
+                'tags': [],
+                'notes': project_notes,
             }
 
             if tags is None:
@@ -606,9 +628,12 @@ class Watson(object):
                     datetime.timedelta()
                 )
 
+                tag_notes = [frame.note for frame in frames if tag in frame.tags and frame.note]
+
                 project_report['tags'].append({
                     'name': tag,
-                    'time': delta.total_seconds()
+                    'time': delta.total_seconds(),
+                    'notes': tag_notes,
                 })
 
             report['projects'].append(project_report)

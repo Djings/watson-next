@@ -3,8 +3,10 @@
 PYTHON ?= python
 PIP ?= pip
 
-VENV = virtualenv
-VENV_ARGS = -p $(PYTHON)
+VENV = python3
+VENV_ARGS = -m venv 
+#VENV = virtualenv
+#VENV_ARGS = -p $(PYTHON)
 VENV_DIR = $(CURDIR)/.venv
 VENV_WATSON_DIR = $(CURDIR)/data
 

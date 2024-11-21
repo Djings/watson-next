@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+ - notes can be added to frames, 
+   reapplied aero31aeros work on the original watson https://github.com/jazzband/Watson/pull/405
+   to watson-next
+
 ## [2.1.0] - 2022-05-16
 
 ### Added
