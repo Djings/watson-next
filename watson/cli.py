@@ -293,10 +293,13 @@ def start(ctx, watson, confirm_new_project, confirm_new_tag, args, at_,
               help=('Stop frame at this time. Must be in '
                     '(YYYY-MM-DDT)?HH:MM(:SS)? format.'))
 @click.option('-n', '--note', type=str, default=None,
-              help="A brief note that describe time entry being stopped")
+              help="A brief note that describe time entry being stopped." +
+                "Unless -c is specified, will by default replace a note specified on start.")
+@click.option('-c', '--concat-note', is_flag=True, default=False,
+              help="Will concatenate the note specified at start to the note specified on stop.")
 @click.pass_obj
 @catch_watson_error
-def stop(watson, at_, note):
+def stop(watson, at_, note, concat_note):
     """
     Stop monitoring time for the current project.
 
@@ -317,7 +320,7 @@ def stop(watson, at_, note):
     Stopping project apollo11, started a minute ago. (id: e7ccd52)
     >> Done some thinking
     """
-    frame = watson.stop(stop_at=at_, note=note)
+    frame = watson.stop(stop_at=at_, note=note, concat_note=concat_note)
     output_str = "Stopping project {}{}, started {} and stopped {}. (id: {})"
     click.echo(output_str.format(
         style('project', frame.project),
