@@ -237,7 +237,7 @@ class Watson(object):
     def is_started(self):
         return bool(self.current)
 
-    def add(self, project, from_date, to_date, tags, note):
+    def add(self, project, from_date, to_date, tags, note=None):
         if not project:
             raise WatsonError("No project given.")
         if from_date > to_date:
