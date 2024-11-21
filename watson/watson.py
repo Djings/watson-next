@@ -561,9 +561,8 @@ class Watson(object):
 
         if self.current and current:
             cur = self.current
-            # FIXME: this seems to need note!
             self.frames.add(cur['project'], cur['start'], arrow.utcnow(),
-                            cur['tags'], id="current")
+                            cur['tags'], note=cur['note'], id="current")
 
         span = self.frames.span(from_, to)
 
