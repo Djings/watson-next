@@ -197,6 +197,7 @@ def test_frames_with_empty_given_state(config_dir, mocker):
     mocker.patch('builtins.open', mocker.mock_open(read_data=content))
     assert len(watson.frames) == 0
 
+
 def test_frames_with_note(mocker, watson):
     """Test loading frames with notes."""
     content = json.dumps([
@@ -243,11 +244,6 @@ def test_frames_without_note(mocker, watson):
     assert frame.tags == ['A', 'B', 'C']
     assert frame.updated_at == arrow.get(3630)
     assert frame.note is None
-
-
-
-
-
 
 
 # config
@@ -407,6 +403,7 @@ def test_stop_started_project_at(watson):
     watson.stop(stop_at=now)
     assert watson.frames[-1].stop == now
 
+
 def test_stop_started_project_without_note(watson):
     """Test stopping watson without adding a note."""
     watson.start('foo')
@@ -431,6 +428,7 @@ def test_stop_started_project_with_note(watson):
     frame = watson.frames[0]
     assert frame.project == 'foo'
     assert frame.note == "My hovercraft is full of eels"
+
 
 # cancel
 
@@ -495,7 +493,8 @@ def test_save_empty_current(config_dir, mocker, json_mock):
 
     assert json_mock.call_count == 1
     result = json_mock.call_args[0][0]
-    assert result == {'project': 'foo', 'start': 4000, 'tags': [], 'note': None}
+    assert result == {'project': 'foo', 'start': 4000, 'tags': [],
+                      'note': None}
 
     watson.current = {}
     watson.save()
@@ -906,8 +905,6 @@ def test_report(watson):
     assert len(report['projects'][0]['tags'][1]['notes']) == 0
     # A tag-level note because this frame has tags
     assert report['projects'][0]['tags'][0]['notes'][0] == 'foo one tag A'
-
-
 
     report = watson.report(arrow.now(), arrow.now(), ignore_projects=["bar"])
     assert len(report['projects']) == 2

@@ -246,7 +246,8 @@ class Watson(object):
         default_tags = self.config.getlist('default_tags', project)
         tags = (tags or []) + default_tags
 
-        frame = self.frames.add(project, from_date, to_date, tags=tags, note=note)
+        frame = self.frames.add(project, from_date, to_date, tags=tags,
+                                note=note)
         return frame
 
     def start(self, project, tags=None, restart=False, start_at=None,
@@ -274,7 +275,8 @@ class Watson(object):
         if start_at > arrow.now():
             raise WatsonError('Task cannot start in the future.')
 
-        new_frame = {'project': project, 'tags': deduplicate(tags), 'note': note}
+        new_frame = {'project': project, 'tags': deduplicate(tags),
+                     'note': note}
         new_frame['start'] = start_at
         if not gap:
             stop_of_prev_frame = self.frames[-1].stop
@@ -300,7 +302,8 @@ class Watson(object):
         if stop_at > arrow.now():
             raise WatsonError('Task cannot end in the future.')
 
-        concat_note = concat_note or self.config.getboolean('options', 'notes_concatenate')
+        concat_note = concat_note or self.config.getboolean(
+                                                'options', 'notes_concatenate')
 
         if note is None:
             note = old.get('note')
@@ -632,7 +635,8 @@ class Watson(object):
                     datetime.timedelta()
                 )
 
-                tag_notes = [frame.note for frame in frames if tag in frame.tags and frame.note]
+                tag_notes = [frame.note for frame in frames if
+                             tag in frame.tags and frame.note]
 
                 project_report['tags'].append({
                     'name': tag,

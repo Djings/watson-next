@@ -8,7 +8,8 @@ HEADERS = ('start', 'stop', 'project', 'id', 'tags', 'updated_at', 'note')
 
 
 class Frame(namedtuple('Frame', HEADERS)):
-    def __new__(cls, start, stop, project, id, tags=None, updated_at=None,note=None):
+    def __new__(cls, start, stop, project, id, tags=None, updated_at=None,
+                note=None):
         try:
             if not isinstance(start, arrow.Arrow):
                 start = arrow.get(start)
@@ -41,7 +42,8 @@ class Frame(namedtuple('Frame', HEADERS)):
         stop = self.stop.to('utc').int_timestamp if self.stop else None
         updated_at = self.updated_at.int_timestamp
 
-        return (start, stop, self.project, self.id, self.tags, updated_at, self.note)
+        return (start, stop, self.project, self.id, self.tags, updated_at,
+                self.note)
 
     @property
     def day(self):
