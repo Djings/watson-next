@@ -186,7 +186,8 @@ def help(ctx, command):
     click.echo(cmd.get_help(ctx))
 
 
-def _start(watson, project, tags, restart=False, start_at=None, gap=True, note=None):
+def _start(watson, project, tags, restart=False, start_at=None, gap=True,
+           note=None):
     """
     Start project with given list of tags and save status.
     """
@@ -295,9 +296,11 @@ def start(ctx, watson, confirm_new_project, confirm_new_tag, args, at_,
                     '(YYYY-MM-DDT)?HH:MM(:SS)? format.'))
 @click.option('-n', '--note', type=str, default=None,
               help="A brief note that describe time entry being stopped." +
-                "Unless -c is specified, will by default replace a note specified on start.")
+              "Unless -c is specified, will by default replace a " +
+              "note specified on start.")
 @click.option('-c', '--concat-note', is_flag=True, default=False,
-              help="Will concatenate the note specified at start to the note specified on stop.")
+              help="Will concatenate the note specified at start " +
+              "to the note specified on stop.")
 @click.pass_obj
 @catch_watson_error
 def stop(watson, at_, note, concat_note):
@@ -580,7 +583,8 @@ _SHORTCUT_OPTIONS_VALUES = {
 @catch_watson_error
 def report(watson, current, from_, to, projects, tags, ignore_projects,
            ignore_tags, year, month, week, day, luna, all, output_format,
-           pager, aggregated=False, include_partial_frames=True, show_notes=False):
+           pager, aggregated=False, include_partial_frames=True,
+           show_notes=False):
     """
     Display a report of the time spent on each project.
 
@@ -1058,7 +1062,8 @@ def aggregate(ctx, watson, current, from_, to, projects, tags, output_format,
 @click.pass_obj
 @catch_watson_error
 def log(watson, current, reverse, from_, to, projects, tags, ignore_projects,
-        ignore_tags, year, month, week, day, luna, all, output_format, pager, show_notes):
+        ignore_tags, year, month, week, day, luna, all, output_format, pager,
+        show_notes):
     """
     Display each recorded session during the given timespan.
 
@@ -1215,7 +1220,8 @@ def log(watson, current, reverse, from_, to, projects, tags, ignore_projects,
             return ''
 
         _print("\n".join(
-            "\t{id}  {start} to {stop}  {delta:>11}  {project}{tags}{notes}".format(
+            ("\t{id}  {start} to {stop}  {delta:>11}  "
+             "{project}{tags}{notes}").format(
                 delta=format_timedelta(frame.stop - frame.start),
                 project=style('project', '{:>{}}'.format(
                     frame.project, longest_project
@@ -1346,7 +1352,8 @@ def add(watson, args, from_, to, confirm_new_project, confirm_new_tag, note):
         confirm_tags(tags, watson.tags)
 
     # add a new frame, call watson save to update state files
-    frame = watson.add(project=project, tags=tags, from_date=from_, to_date=to, note=note)
+    frame = watson.add(project=project, tags=tags, from_date=from_, to_date=to,
+                       note=note)
     click.echo(
         "Adding project {}{}, started {} and stopped {}. (id: {})".format(
             style('project', frame.project),
@@ -1395,7 +1402,8 @@ def edit(watson, confirm_new_project, confirm_new_tag, id):
         id = frame.id
     elif watson.is_started:
         frame = Frame(watson.current['start'], None, watson.current['project'],
-                      None, watson.current['tags'], None, watson.current['note'])
+                      None, watson.current['tags'], None,
+                      watson.current['note'])
     elif watson.frames:
         frame = watson.frames[-1]
         id = frame.id
@@ -1408,7 +1416,7 @@ def edit(watson, confirm_new_project, confirm_new_tag, id):
         'start': frame.start.format(datetime_format),
         'project': frame.project,
         'tags': frame.tags,
-        'note' : "" if frame.note is None else frame.note,
+        'note': "" if frame.note is None else frame.note,
     }
 
     if id:
@@ -1485,7 +1493,8 @@ def edit(watson, confirm_new_project, confirm_new_tag, id):
         watson.frames[id] = (project, start, stop, tags, id, updated_at, note)
 
     else:
-        watson.current = dict(start=start, project=project, tags=tags, note=note)
+        watson.current = dict(start=start, project=project, tags=tags,
+                              note=note)
 
     watson.save()
     click.echo(
@@ -1507,7 +1516,6 @@ def edit(watson, confirm_new_project, confirm_new_tag, id):
 
     if note is not None and note != '':
         click.echo("Note: {}".format(style('note', note)))
-
 
 
 @cli.command(context_settings={'ignore_unknown_options': True})
